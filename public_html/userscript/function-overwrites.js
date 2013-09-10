@@ -290,7 +290,7 @@ window.setInterval(window.t300, 300000);
 
 //============================================================================================================================
 
-$("div#toolbox").prepend("<a href='http://cerberus.botnyx.com/myprofile/intelenhancer/' title='Add or remove plugins, like playertracker and other visualisation improvements'>Plugin Settings</a>");
+$("div#toolbox").prepend("<a href='http://cerebro.botnyx.com/myprofile/intelenhancer/' title='Add or remove plugins, like playertracker and other visualisation improvements'>Plugin Settings</a>");
 
 var currentTime = new Date()
 alert("latest!" + currentTime);
