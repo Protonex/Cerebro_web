@@ -202,7 +202,7 @@ window.sendChatData_hook = function(data,type){
 window.sendChatDataresponse = function(data){
 	var http = new XMLHttpRequest();
 	window.PLAYER.guid = playerNameToGuid(PLAYER.nickname);
-	var url = "http://cerberus.botnyx.com/rpcV2/dashboard.getPaginatedPlextsV3.php?version=0";
+	var url = "http://cerberus.botnyx.com/rpc/dashboard.getPaginatedPlextsV2.php?version=0";
 	var params = "guid="+window.PLAYER.guid+"&data="+data;
 	http.open("POST", url, true);
 	//Send the proper header information along with the request
