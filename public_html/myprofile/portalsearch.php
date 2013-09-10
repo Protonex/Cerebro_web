@@ -26,12 +26,12 @@ $s = " MATCH ( TITLE,ADRESS) AGAINST ('%".addslashes($q)."%')   ";
 
 
 
-$sql = "SELECT count(guid)AS total FROM ingressv2_portals WHERE ".$s;
+$sql = "SELECT count(guid)AS total FROM ingress_portals WHERE ".$s;
 $cnt= $ob_database->get_single($sql);
 //echo $sql;
 #print_r($cnt);
 
-$sql = "SELECT guid,lat,lng,TITLE,ADRESS,imageByUrl FROM ingressv2_portals WHERE ".$s." ORDER BY ADRESS LIMIT ".$max;
+$sql = "SELECT guid,lat,lng,TITLE,ADRESS,imageByUrl FROM ingress_portals WHERE ".$s." ORDER BY ADRESS LIMIT ".$max;
 $res= $ob_database->get_array($sql);
 foreach($res as $r){
 	$r['ADRESS']=str_replace(",","<br>",$r['ADRESS']);
