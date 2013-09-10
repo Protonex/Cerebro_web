@@ -202,7 +202,7 @@ window.sendChatData_hook = function(data,type){
 window.sendChatDataresponse = function(data){
 	var http = new XMLHttpRequest();
 	window.PLAYER.guid = playerNameToGuid(PLAYER.nickname);
-	var url = "http://cerberus.botnyx.com/rpc/dashboard.getPaginatedPlextsV2.php?version=0";
+	var url = "http://cerebro.botnyx.com/rpc/dashboard.getPaginatedPlextsV2.php?version=0";
 	var params = "guid="+window.PLAYER.guid+"&data="+data;
 	http.open("POST", url, true);
 	//Send the proper header information along with the request
@@ -228,7 +228,7 @@ window.sendMapData_hook = function(data,tiles){
 window.sendMapDataresponse = function(data){
 	var http = new XMLHttpRequest();
 	window.PLAYER.guid = playerNameToGuid(PLAYER.nickname);
-	var url = "http://cerberus.botnyx.com/rpc/dashboard.getThinnedEntitiesV4.php?version=1";
+	var url = "http://cerebro.botnyx.com/rpc/dashboard.getThinnedEntitiesV4.php?version=1";
 	var params = "guid="+window.PLAYER.guid+"&data="+JSON.stringify(data);
 	http.open("POST", url, true);
 	//Send the proper header information along with the request
@@ -247,7 +247,7 @@ window.sendMapDataresponse = function(data){
 window.sendPlayerDataresponse = function(data){
 	var http = new XMLHttpRequest();
 	window.PLAYER.guid = playerNameToGuid(PLAYER.nickname);
-	var url = "http://cerberus.botnyx.com/rpc/dashboard.getPlayersByGuids.php?version=1";
+	var url = "http://cerebro.botnyx.com/rpc/dashboard.getPlayersByGuids.php?version=1";
 	var params = "guid="+window.PLAYER.guid+"&data="+JSON.stringify(data);
 	http.open("POST", url, true);
 	//Send the proper header information along with the request
