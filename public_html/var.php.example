@@ -1,0 +1,20 @@
+<?php
+
+date_default_timezone_set('Europe/Amsterdam');
+
+define( 'CBASE' , "/path_to/public_html/");
+define( 'INCLUDES', CBASE."include/" );
+
+  
+define('CDBHOST',"127.0.0.1");
+define('CDBNAME',"");
+define('CDBUSER',"");
+define('CDBPASS',"");
+define('CDBPREFIX',"");	
+define('CDOMAIN',"");
+
+
+
+
+
+?>
