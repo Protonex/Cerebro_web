@@ -17,7 +17,7 @@ if($_POST['s']){
 	
 	#print_r($array);
 	#die();
-	$sql = "UPDATE ingressv2_verified SET settings='".json_encode($array)."' WHERE email='".addslashes($ob_auth->googledata['email'])."'";
+	$sql = "UPDATE ingress_verified SET settings='".json_encode($array)."' WHERE email='".addslashes($ob_auth->googledata['email'])."'";
 	$ob_database->execute($sql);
 	header("Location: http://ingress.com/intel");
 }
