@@ -1,0 +1,5 @@
+# Redirect old file path to new file path
+Redirect ips2main.meta.js http://home.botnyx.com/script/iitcplugin/ips2main.meta.js
+
+# Redirect old file path to new file path
+Redirect ips2main.user.js http://home.botnyx.com/script/iitcplugin/ips2main.user.js
