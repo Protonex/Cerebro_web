@@ -12,8 +12,8 @@ class auth {
 	}	
 
 	function gauth(){	
-		require_once CBASE.'/google-api-php-client/src/Google_Client.php';
-		require_once CBASE.'/google-api-php-client/src/contrib/Google_Oauth2Service.php';
+		require_once CBASE.'include/google-api-php-client/src/Google_Client.php';
+		require_once CBASE.'include/google-api-php-client/src/contrib/Google_Oauth2Service.php';
 	
 	//	if(!$_SESSION){ session_start(); }
 	
@@ -138,7 +138,7 @@ class auth {
 	function is_verified_player(){
 		global $ob_database;
 		
-		$sql= "SELECT * FROM ingressv2_verified WHERE email='".addslashes($this->googledata['email'])."'";
+		$sql= "SELECT * FROM ingress_verified WHERE email='".addslashes($this->googledata['email'])."'";
 		$res = $ob_database->get_single($sql);
 		if($res){
 			unset($res['google']);

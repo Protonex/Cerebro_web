@@ -100,9 +100,7 @@ class user {
 
 
 
-
 $ob_user = new user();
-
 
 
 require_once CBASE.'include/Mobile_Detect.php';
@@ -117,7 +115,7 @@ $scriptVersion = $detect->getScriptVersion();
 #start ingres + google auth
 
 include(CBASE."include/class.ingress.php");
-#$ob_ingress = new ingress();
+$ob_ingress = new ingress();
 
 
 

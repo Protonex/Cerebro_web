@@ -1,10 +1,10 @@
 // ==UserScript==
 // @id             ingress-netherlands@jerryhopper
-// @name           Ingress intel map enhancer
-// @version        0.0.0.9
-// @namespace      http://home.botnyx.com/
-// @updateURL      http://home.botnyx.com/script/iitcplugin/ips2main.meta.js
-// @downloadURL    http://home.botnyx.com/script/iitcplugin/ips2main.user.js
+// @name           Ingress Cerebro
+// @version        0.0.0.2
+// @namespace      http://cerebro.botnyx.com/
+// @updateURL      http://cerebro.botnyx.com/userscript/ips2main.meta.js
+// @downloadURL    http://cerebro.botnyx.com/userscript/ips2main.user.js
 // @description    Portal submission tool for ingress portals
 // @include        http://www.ingress.com/intel*
 // @include        https://www.ingress.com/intel*
