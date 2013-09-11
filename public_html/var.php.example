@@ -15,6 +15,9 @@ define('CDBPREFIX',"");
 define('CDOMAIN',"");
 
 
+# REDIS - www.redis.io
+define('USE_REDIS',"TRUE"); // TRUE - or FALSE  
+
 
 #Google API Access
 define('application_name',"");	
