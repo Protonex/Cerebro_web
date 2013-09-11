@@ -1,0 +1,12 @@
+
+Mysql table : ingress_players 
+
+Redis keys : 
+playerguid:782372983:guid			( contains plguid )
+playerguid:782372983:faction   		( contains faction )
+playerguid:782372983:nick			( contains nick )
+playerguid:782372983:level			( contains level )
+playerguid:782372983:lastupdated	( contains lastupdated )
+playerguid:782372983:lastlocation	( contains lastlocation )
+	
+playername:jerryhopper   ( contains plguid )

@@ -6,6 +6,23 @@ class postdata
 	var $content_length;
 	var $guid;
 	
+	function check_json($class)
+	{
+		
+		
+		if( !property_exists($class,"guid") && !property_exists($class,"gameBasket") && !property_exists($class,"result") ) 
+		{
+			return false;	
+		} 
+		else 
+		{
+			return true;
+		}
+		
+		
+	}
+	
+	
 	function checkpostdata()
 	{
 		# are there post variables?
@@ -69,12 +86,11 @@ class postdata
 			} else { $this->log("RAW is an ARRAY"); }
 			
 		}
-
-
-		$this->rawpostdata = $RAW;
-		return $RAW;
 		
-			
+		$this->rawpostdata = $RAW;
+		$this->rawpostdata->guid = $this->guid;
+		
+		return $RAW;
 	}
 	
 	

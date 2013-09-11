@@ -70,6 +70,37 @@ $usr = $ob_database->get_single($ss);
 
 
 
+
+$sql = "SELECT guid FROM ingress_players WHERE guid='".addslashes($usr['guid'])."'";
+#echo $sql;
+$ress = $ob_database->get_single($sql);
+
+if($ress==NULL & strlen($usr['guid'])>8 ){
+	
+	
+	$sql = "SELECT nickname,team FROM ingress_playerdata WHERE guid='".$usr['guid']."' AND guid<>''";
+	$temp = $ob_database->get_single($sql);
+	#echo $usr['guid'];
+	#echo $temp['nickname'];
+	
+	$sql = "INSERT INTO ingress_players (`guid` ,`name` ,`level` ,`faction` )
+	VALUES ( '".addslashes($usr['guid'])."', '".addslashes($temp['nickname'])."', '0', '".addslashes($temp['team'])."' );";
+	//$sql = "UPDATE ingress_verified SET guid='".addslashes($playerdata['guid'])."' WHERE email='".addslashes($playerdata['email'])."' ";
+	$ob_database->execute($sql);
+	#echo $usr['name'];
+	#var_dump($temp['nickname']);
+	#die();	
+}
+
+
+
+
+
+
+#print_r($usr['guid']);
+
+
+
 if($usr==NULL){ /*nonverified user*/
 	
 	$sql= "SELECT * FROM web_users WHERE email='".addslashes($playerdata['email'])."'";
@@ -79,6 +110,10 @@ if($usr==NULL){ /*nonverified user*/
 	
 	$sql = "INSERT INTO ingress_verified (`nickname`,`email`,`faction`,`guid`,`google`)VALUES('".addslashes($playerdata['nickname'])."','".addslashes($playerdata['email'])."','".addslashes($playerdata['team'])."','NULL','".addslashes( json_encode($usr) )."')";
 	$res = $ob_database->execute($sql);
+
+
+
+
 
 	if($res){
 		$_OUT['status'] = "firstrun";
@@ -100,6 +135,10 @@ if($usr['guid']=="NULL"||$usr['guid']==""){
 	$sql = "UPDATE ingress_verified SET guid='".addslashes($playerdata['guid'])."' WHERE email='".addslashes($playerdata['email'])."' ";
 	//echo $sql;
 	$ob_database->execute($sql);
+	
+	
+
+	
 }
 //die();
 

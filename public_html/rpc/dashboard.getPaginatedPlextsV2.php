@@ -1,5 +1,4 @@
 <?php
-
 header('X-Error-Message: Not implemented... yet!', true, 500);
 
 header('Access-Control-Allow-Origin: *'); 
@@ -9,120 +8,275 @@ header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 header("Cache-Control: no-store, no-cache, must-revalidate");
 header("Cache-Control: post-check=0, pre-check=0", false);
 header("Pragma: no-cache");
+header('Content-Type: application/javascript');
+
+//error_log("dashboard.getPaginatedPlextsV2");
+
+if(!$_POST['guid']){ die('playerid error');}
+
+
+
+//	application/json
 $noauth=true;
 include("../var.php");
 include(CBASE."common.php");
 
-#
+#functions
+include(CBASE."rpc/functions/GEOtoE6.php");
+include(CBASE."rpc/functions/E6toGEO.php");
+include(CBASE."rpc/class/dblog.php");
+
+#classes
 include(CBASE."rpc/class/class.postdata.php");
-
-#die();
-
+include(CBASE."rpc/class/class.player.php");
+include(CBASE."rpc/class/class.plext.userarray.php");
+include(CBASE."rpc/class/class.plexts.php");
+#normalize/check postdata.
 $ob_postdata = new postdata();
-$DATA = $ob_postdata->checkpostdata();
-$DATA->guid = $ob_postdata->guid;
+$RAW = $ob_postdata->checkpostdata();
+
+if(!$ob_postdata->check_json($RAW)){ die("INVALID JSON"); }
+
+
+#check player
+$player = new player();
+$playerinfo  = $player->get_by_guid($RAW->guid);
+#print_r($player->log);
+
+
+#print_r($playerinfo);
+$playerinfo['guid'];
+$playerinfo['faction'];
+$playerinfo['nick'];
+$playerinfo['level'];
+$playerinfo['lastupdated'];
+$playerinfo['lastlocation'];
+
+#some check
+if(!$playerinfo) { die("no such user known."); }
+
+
+//  $RAW->guid ; submitterGUID
+//  $RAW->gameBasket ; 
+//  $RAW->result ; 
+
+
+#log
+$nickname= addslashes("");
+$email= addslashes("");
+$faction= addslashes("");
+$guid	= addslashes($RAW->guid);
+$data= addslashes(formatBytes($_SERVER['CONTENT_LENGTH']) );
+$action= addslashes('comms-submit');
+$remote_addr= addslashes($_SERVER['REMOTE_ADDR']);
+$lat= NULL;
+$lng= NULL;
+
+
+
+# ?
+$USER = $playerinfo['nick'];
 
 
 
 
-echo "<br><pre>";
-print_r($DATA);
-#writejson($DATA);
 
 
-function writejson ($data){
+
+# check data
+if( count($RAW->result[0])<2 ){
+//	print_r($RAW);	
+	die("bad data");
+}
+
+
+
+
+# set plguid
+$plguid = trim($playerinfo['guid']);
 	
 	
-	$maptile = key($data->result->map); 
-	$filename = "maptiles/".$maptile.".json";
-	
-	$somecontent = json_encode($data->result->map);
 
-	$fp = fopen($filename, "w");
-	if (flock($fp, LOCK_EX)) {  // acquire an exclusive lock
-		ftruncate($fp, 0);      // truncate file
-		fwrite($fp, $somecontent );
-		fflush($fp);            // flush output before releasing the lock
-		flock($fp, LOCK_UN);    // release the lock
-		fclose($fp);
+
+
+# create userobject for mined-users
+$ob_user = new userarray();
+
+
+
+
+
+
+# initialize plexts class
+$ob_plexts = new plexts();
+
+
+
+
+#echo count($RAW->result)."items.";
+#reset counters
+$fails=0;$msgs=0;
+# LOOP THRU ALL MESSAGES
+foreach($RAW->result as $i){
+	
+	#echo "i";
+	if($ob_plexts->process($i,$plguid)){
+		$msgs++;
+	}else{$fails++;};
+	
+}	
+
+die("!");
+
+
+
+
+//error_log("Inserted $msgs broadcasts ($fails failed)");
+	#echo "no id";
+	#test($r['24']);
+
+
+
+
+//
+
+// guid,team, where,wherelat,wherelng,geopoint,ownedby,what,who,affectedportals
+// submitter_plguid,submitter_ip,plaintext,markup
+/*
+			$WHERE		= $markup[1][1]->guid;//
+			$WHERELAT	= $markup[1][1]->latE6;
+			$WHERELNG	= $markup[1][1]->lngE6;
+			$OWNEDBY	= $plguid;
+			$WHO		= $markup[5][1]->guid;
+			$WHAT		= " link destroyed";
+*/
+//
+
+
+#echo "<pre>";
+#print_r($ob_user);
+//echo "</pre>";
+
+$inserts = 0;
+$teller = 0;
+foreach($ob_user->users as $u){
+	
+	error_log("------------> ".$u['team']." ".$u['plain']." ");
+	//echo $u['plain']."\n";
+	
+	if($u['_level']<>''){
+		$sql = "UPDATE ingressv2_players SET faction = '".$u['team']."',level='".$u['_level']."' WHERE guid='".addslashes($u['guid'])."' AND level<'".$u['_level']."'";
+		
+		#error_log($u['plain']." ".$sql);
 	} else {
-		echo "Couldn't get the lock!";
+		$sql = "UPDATE ingressv2_players SET faction = '".$u['team']."' WHERE guid='".addslashes($u['guid'])."' AND faction=''";
 	}
+//	echo "<pre>";
+//	print_r($u);
+//	die();
+	//echo $sql."\n";
+	
+	#mail("hopper.jerry@gmail.com","SQLL ".$u['name'].$u['nick'].$u['nickname'],$sql);
+	
+	$ob_database->execute($sql) ;
+	
+	
+	if($ob_database->dblink->affected_rows==0)
+	{
+		
+		$sql = "INSERT INTO ingressv2_players (guid,name,faction)VALUES('".$u['guid']."','".addslashes(str_replace(":","",$u['plain']))."','".$u['team']."');";
+		//echo $sql."\n";
+		//error_log($sql);
+		$ob_database->execute($sql);
+		
+		if($ob_database->dblink->affected_rows>0)
+		{ 
+			$inserts++;
+		}
+		
+	}
+	else 
+	{ 
+		//echo "Record updated. \n";
+		$teller ++; 
+	}
+	
+}
 
 
+
+
+#error_log("[dashboard.getPaginatedPlextsV2][$USER] $msgs new broadcasts ($fails failed) --- Players new/upd: ".$inserts."/".$teller."",0);
+
+
+# The end!
+
+function add_the_player($guid,$name=NULL,$level=0,$faction=NULL){
+	global $ob_database;
+	error_log("------------> adding:".$guid);
+	
+	
+	$sql = "INSERT INTO ingressv2_players (`guid`,`name`,`level`,`faction`)VALUES('$guid','".str_replace(":","",$name)."','$level','$faction');";
+	$res = $ob_database->execute($sql);
+	return $res;
+	
 }
 
 
 
 
 
-if(!isset($_POST['guid'])){ die("err");}
-$guid = trim($_POST['guid']);
 
-$sql = "SELECT * FROM ingress_players WHERE guid='".addslashes($guid)."'";
-$usr = $ob_database->get_single($sql);
-$USER = $usr['name'];
-
-
-
-
-$RAW = json_decode(utf8_encode($_POST['data']));
-
- error_log("$USER: ".formatBytes($_SERVER["CONTENT_LENGTH"],2) );
-
-error_log("[dashboard.getThinnedEntitiesV2][$USER] ");
-
-
-
-if( is_null($RAW) ){ 
-	//header("HTTP/1.0 404 Not Found");
-//	error_log("[dashboard.getThinnedEntitiesV2][".$USER."] - try repair Invalid postdata");
-//	error_log("No postdata");
-	//echo (int) $_SERVER['CONTENT_LENGTH'];
-	
-	$ERAW = file_get_contents("php://input");
-	
-	$ERAW = str_replace("guid=".$guid."&data=","",$ERAW);
-	$ERAW = json_decode(utf8_encode($ERAW));
-	//echo "<pre>";
-	if($ERAW==NULL){
+function adduser($x,$level=1){
+		global $ob_user;
 		
-		header('X-Error-Message: No valid postdata', true, 500);
-		error_log("[dashboard.getThinnedEntitiesV2][".$USER."] - error NO VALID POSTDATA");
-		die("no postdata"); 
+		foreach($x as $key=>$value){
+		error_log($key."->".$value);
+			
+		}
 		
 		
-		} else {
-			$RAW = $ERAW;
-			$ERAW = NULL ;
-			}
-	//print_r(json_decode(utf8_encode($ERAW)));
-	
-	
-	
-	
-	//print_r($_POST['data']);
-	
+		
+		
+		
+		$ob_user->addusers($x,$level);
+
+		#echo "<pre>";
+		#print_r($x);
+		#echo "</pre>";
+		
+		//$_USER[$x['plain']]=$x;
 }
 
 
 
-$RAW = json_decode($RAW);
 
 
-echo "$USER posted: <b>".formatBytes($_SERVER["CONTENT_LENGTH"],2)."</b> of ingress data.";
+/*
 
-echo " minLevelOfDetail:".$RAW->result->minLevelOfDetail;
+$markup[0][0] == "TEXT"
+$markup[0][1] == " Resonator on "
 
-echo "<pre>";
-print_r($RAW );
+$markup[1][0] == "TEXT"
+$markup[2][0] == "TEXT"
 
-die();
+$markup[3][0] == "PORTAL"
+
+$markup[4][0] == "TEXT"
+$markup[4][1] == " has decayed "
 
 
 
 
+/*
+
+$markup[0][0] == "TEXT"
+$markup[1][0] == "PORTAL"   WHERE
+$markup[2][0] == "TEXT"
+$markup[2][1] == " is under attack by "   WHAT
+$markup[3][0] == "PLAYER"   WHO
 
 
+*/
 
 ?>
