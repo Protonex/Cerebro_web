@@ -171,7 +171,7 @@ class player
 	
 	function get_by_guid($plguid){
 		global $ob_database,$redis;
-
+		
 		$this->log("get_by_guid($plguid)");
 		if(USE_REDIS)
 		{	
@@ -179,7 +179,7 @@ class player
 			$redis->select(0); /* select databaseID */	
 			
 			if( $redis->exists('playerguid:'.$plguid.':lastupdated')){
-				//echo "found key in redis!";
+				#echo "found key in redis!";
 				$this->log("plguid exist in redis lookuptable");
 				$out['guid']		 = $plguid;
 				$out['faction']		 = $redis->get('playerguid:'.$plguid.':faction');
@@ -192,12 +192,15 @@ class player
 			} else {
 				$this->log("plguid key not in redis");
 				
-				# playerguid doesnt exist, get from mysql 
+				//echo "plguid key not in redis";
 				
+				# playerguid doesnt exist, get from mysql 
+				//echo "found key in redis!";
 				$sql = "SELECT * FROM ingress_players WHERE guid='".addslashes($plguid)."'";
 				$usr = $ob_database->get_single($sql);
 				if($usr==NULL)
 				{ 
+					#echo "plguid not in mysql";
 					$this->log("plguid not in mysql");
 					return false; 
 				}
