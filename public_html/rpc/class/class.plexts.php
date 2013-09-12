@@ -38,11 +38,15 @@ class plexts {
 		
 	
 	
-		die($msgtype);
+		//die($msgtype);
 		
 		
 		switch($msgtype){
 			case "SYSTEM_NARROWCAST":
+				break;
+				## return!!!! - debug
+				
+				//die("SYSTEM_NARROWCAST");
 				//error_log("system_narrowcast");
 				//echo  $id[2]->plext->team ." --> ".$id[2]->plext->plextType. "<br>";
 				$result = $this->system_narrowcast($plguid,$genby,$uniqueid,$timestamp,$plaintxt,$markup);
@@ -70,6 +74,11 @@ class plexts {
 				
 				break;
 			case "PLAYER_GENERATED":
+				break;  
+				## return!!!! - debug
+				
+				
+				die("PLAYER_GENERATED");
 				#echo  $id[2]->plext->team ." --> ".$id[2]->plext->plextType. "<br>";
 				$result = $this->player_generated($plguid,$genby,$uniqueid,$timestamp,$plaintxt,$markup);
 				
@@ -80,7 +89,11 @@ class plexts {
 				break;
 			
 			case "SYSTEM_BROADCAST":
+				//break;
 				$result = $this->system_broadcast($plguid,$genby,$uniqueid,$timestamp,$plaintxt,$markup);
+				#print_r($result);
+				
+				//die("SYSTEM_BROADCAST");
 				//echo  $id[2]->plext->team ." --> ".$id[2]->plext->plextType. "<br>";
 				$result['plaintxt']=$plaintxt;
 				$result['markup']=json_encode($markup);
@@ -94,10 +107,10 @@ class plexts {
 				
 				//add_the_player($guid,$name=NULL,$level=0,$faction=NULL);
 				
-				
-				
+				break;
+				## return!!!! - debug
 					
-				$sql = "INSERT INTO ingressv2_broadcast
+				$sql = "INSERT INTO ingress_broadcast
 				(`guid`,`team`,`where`,`wherelat`,`wherelng`,`geopoint`,`ownedby`,`what`,`who`,`affectedportals`,`submitter_plguid`,`submitter_ip`,`plaintext`,`markup`,`timestamp`) 
 				VALUES 
 				('".addslashes($uniqueid)."','".addslashes($genby)."','".addslashes($result['WHERE'])."','".addslashes(E6topos($result['WHERELAT']))."','".addslashes(E6topos($result['WHERELNG']))."',( GeomFromText( 'POINT(".$result['WHERELAT']."  ".$result['WHERELNG'].") ' ) ) ,'".addslashes($result['OWNEDBY'])."','".addslashes($result['WHAT'])."','".addslashes($result['WHO'])."','".addslashes($result['AFFECTED'])."','".addslashes($plguid)."','".addslashes($_SERVER['REMOTE_ADDR'])."','".addslashes(str_replace("Your",$usr['name']."'s", $plaintxt))."','".addslashes(json_encode($markup))."','".($timestamp/1000)."')";
@@ -187,7 +200,7 @@ class plexts {
 		$known = false;
 		error_log("system_broadcast");
 		#echo "---<br>";
-		//var_dump($markup[1][1]->plain);
+		//print_r($markup);
 		#print_r($plguid);
 		if($markup[0][1]->plain=='The Link '){
 			//$WHO		= $markup[0][1]->guid;
@@ -231,7 +244,12 @@ class plexts {
 		
 		
 		if($markup[0][1]->guid){
-			adduser($markup[0][1]);
+			
+			#print_r($markup[0][1]);
+			$this->adduser($markup[0][1]);
+			#global  $ob_user;
+			#print_r($ob_user);
+			
 			$WHO		= $markup[0][1]->guid;
 			if($markup[1][1]->plain==" linked "){
 				$WHERE		= $markup[2][1]->guid;//
@@ -250,7 +268,7 @@ class plexts {
 				
 				error_log("_____________________________________________________");
 				
-				adduser($markup[0][1],$markup[2][1]->plain);
+				$this->adduser($markup[0][1],$markup[2][1]->plain);
 				
 				
 				
@@ -384,7 +402,7 @@ class plexts {
 							$WHERELAT	= $markup[5][1]->latE6;
 							$WHERELNG	= $markup[5][1]->lngE6;
 							$OWNEDBY	= $plguid;
-							adduser($markup[7][1]);
+							$this->adduser($markup[7][1]);
 							$WHO		= $markup[7][1]->guid;
 							$WHAT		= "destroy-shield";						
 							  
@@ -403,7 +421,7 @@ class plexts {
 						$OWNEDBY	= $plguid;
 						if(isset($markup[5]) ){ 
 						  $WHO		= $markup[5][1]->guid;
-						  adduser($markup[5][1]);
+						  $this->adduser($markup[5][1]);
 						} else { $WHO =''; }
 						
 						$WHAT		= "destroy-resonator";
@@ -454,7 +472,7 @@ class plexts {
 				  $WHERELAT	= $markup[1][1]->latE6;
 				  $WHERELNG	= $markup[1][1]->lngE6;
 				  $OWNEDBY	= $plguid;
-				  adduser($markup[3][1]);
+				  $this->adduser($markup[3][1]);
 				  $WHO		= $markup[3][1]->guid;
 	  
 				  
@@ -465,7 +483,7 @@ class plexts {
 				  if($markup[4][1]->plain==" destroyed by "){
 					  $print = false;
 					  $known = true;
-					  adduser($markup[5][1]);
+					  $this->adduser($markup[5][1]);
 					  $WHO		= $markup[5][1]->guid;
 					  $WHAT		= "link-destroy";
 				  }
@@ -484,7 +502,7 @@ class plexts {
 				  $WHERELNG	= $markup[1][1]->lngE6;
 				  $OWNEDBY	= $plguid;
 				  
-				  //adduser($markup[5][1]);
+				  //$this->adduser($markup[5][1]);
 				  
 				  //error_log("--->".$markup[4][1]->plain);
 				  
@@ -534,7 +552,15 @@ class plexts {
 
 
 
-
+	function adduser($x,$level=1){
+			global $ob_user;
+			
+			foreach($x as $key=>$value){
+				error_log($key."->".$value);
+			}
+			
+			$ob_user->addusers($x,$level);
+	}
 
 
 

@@ -4,6 +4,76 @@ class player
 {
 	var $log;
 	
+	function check_user($u)
+	{
+		global $ob_database,$redis;
+		if(USE_REDIS){
+			$redis->select(0); /*select databaseID*/ 
+			#echo "using redis\n";
+			
+			$test = $this->get_by_guid($u['guid']);
+			#var_dump($test);
+			
+			if( !$test )
+			{
+				$this->log("key does not exist in redis and not in mysql");
+				#echo "key does not exist in redis and not in mysql\n";
+				
+				$sql = "INSERT INTO ingress_players ( `guid` , `name` ,  `faction`   )VALUES ('".$u['guid']."','".$u['plain']."','".$u['team']."')";
+				$ob_database->execute($sql);
+				
+				$u['plain'];
+				$u['guid'];
+				$u['team'];
+				$u['_level'];
+				
+
+
+				$redis->set('playerguid:'.$u['guid'].':guid', $u['guid'] );
+				$redis->set('playerguid:'.$u['guid'].':faction', $u['team'] );
+				$redis->set('playerguid:'.$u['guid'].':nick', $u['plain'] );
+				//$redis->set('playerguid:'.$plguid.':level', $u['_level'] );
+				//$redis->set('playerguid:'.$plguid.':lastupdated', $u['lastupdated'] );	
+				//$redis->set('playerguid:'.$plguid.':lastlocation', $u['lastseenat'] );
+
+				#print_r($u);
+				#die("!");
+				
+			} 
+			else 
+			{
+				$this->log("key exist in redis ( and so it does in mysql)");	
+				
+				#print_r($test);
+				#print_r($u);
+				#die("key does exist in redis ( and so it does in mysql)");
+				
+				
+				
+				
+			}
+			
+			
+			
+		} else {
+		
+				$sql = "INSERT INTO ingress_players ( `guid` , `name` ,  `faction`   )VALUES ('".$u['guid']."','".$u['plain']."','".$u['team']."')";
+				$ob_database->execute($sql);					
+		}			
+
+
+
+
+		echo $u['guid']."\n";
+		#die("stop");
+		
+	}
+	
+	
+	
+	
+	
+	
 	
 	function get_by_name($name){
 		if(USE_REDIS)

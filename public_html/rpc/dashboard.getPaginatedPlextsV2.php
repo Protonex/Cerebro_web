@@ -126,7 +126,7 @@ foreach($RAW->result as $i){
 	
 }	
 
-die("!");
+
 
 
 
@@ -157,12 +157,17 @@ die("!");
 #print_r($ob_user);
 //echo "</pre>";
 
+
+# loop thru all users that we have collected.
 $inserts = 0;
 $teller = 0;
 foreach($ob_user->users as $u){
 	
 	error_log("------------> ".$u['team']." ".$u['plain']." ");
 	//echo $u['plain']."\n";
+	
+	$player->check_user($u);
+	
 	
 	if($u['_level']<>''){
 		$sql = "UPDATE ingressv2_players SET faction = '".$u['team']."',level='".$u['_level']."' WHERE guid='".addslashes($u['guid'])."' AND level<'".$u['_level']."'";
@@ -178,7 +183,7 @@ foreach($ob_user->users as $u){
 	
 	#mail("hopper.jerry@gmail.com","SQLL ".$u['name'].$u['nick'].$u['nickname'],$sql);
 	
-	$ob_database->execute($sql) ;
+#@#@#@#@	$ob_database->execute($sql) ;
 	
 	
 	if($ob_database->dblink->affected_rows==0)
@@ -187,12 +192,12 @@ foreach($ob_user->users as $u){
 		$sql = "INSERT INTO ingressv2_players (guid,name,faction)VALUES('".$u['guid']."','".addslashes(str_replace(":","",$u['plain']))."','".$u['team']."');";
 		//echo $sql."\n";
 		//error_log($sql);
-		$ob_database->execute($sql);
+#@#@#@#@		$ob_database->execute($sql);
 		
-		if($ob_database->dblink->affected_rows>0)
-		{ 
-			$inserts++;
-		}
+#@#@#@#@		if($ob_database->dblink->affected_rows>0)
+#@#@#@#@		{ 
+#@#@#@#@			$inserts++;
+#@#@#@#@		}
 		
 	}
 	else 
@@ -202,6 +207,18 @@ foreach($ob_user->users as $u){
 	}
 	
 }
+
+
+
+#print_r($ob_user);
+#print_r($player);
+
+die("!");
+
+
+
+
+
 
 
 
