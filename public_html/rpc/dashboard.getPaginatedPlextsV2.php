@@ -1,5 +1,5 @@
 <?php
-header('X-Error-Message: Not implemented... yet!', true, 500);
+#header('X-Error-Message: Not implemented... yet!', true, 500);
 
 header('Access-Control-Allow-Origin: *'); 
 //no  cache headers 
