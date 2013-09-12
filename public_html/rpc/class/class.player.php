@@ -35,7 +35,7 @@ class player
 				//$redis->set('playerguid:'.$plguid.':level', $u['_level'] );
 				//$redis->set('playerguid:'.$plguid.':lastupdated', $u['lastupdated'] );	
 				//$redis->set('playerguid:'.$plguid.':lastlocation', $u['lastseenat'] );
-
+				$redis->set('playername:'.$u['plain'],$u['guid'] );
 				#print_r($u);
 				#die("!");
 				
