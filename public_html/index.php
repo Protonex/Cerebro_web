@@ -21,7 +21,7 @@ include(CBASE."common.php");
     <![endif]-->
 
     <!-- Fav and touch icons -->
-  
+
   </head>
 
   <body>
@@ -55,29 +55,26 @@ include(CBASE."common.php");
       <?php } ?>
       <!-- Main hero unit for a primary marketing message or call to action -->
       
-      <?php if($deviceType!="iphone"){ ?>
+      <?php if($deviceType=="phone"){ ?>
       
-<p id="demo">please wait while we get your coordinates:</p>
-<button class="btn" onclick="location.reload(); ">refresh location </button>
-<script>
 
-var x=document.getElementById("demo");
-function getLocation()
-  {
-  if (navigator.geolocation)
-    {
-    navigator.geolocation.getCurrentPosition(showPosition);
-    }
-  else{x.innerHTML="Geolocation is not supported by this browser.";}
-  }
-function showPosition(position)
-  {
-  x.innerHTML="Latitude: " + position.coords.latitude + 
-  "<br>Longitude: " + position.coords.longitude;	
- }
+<button class="btn" onclick="lookup_location();return false; ">refresh location </button>
+<p id="geocontent">please wait while we get your coordinates:</p>
+<?php 
+global $ob_auth;
+#echo "<pre>";
+#print_r($ob_auth);
+#$ob_auth->loggedin;
+#print_r($ob_auth->verified['guid']);
+#print_r($ob_auth->verified['faction']);
+#print_r($ob_auth->verified['nickname']);
 
-getLocation();
-</script>      
+
+#echo "</pre>";
+
+ ?>
+
+      
       
       
 	  <?php }?>
@@ -187,6 +184,8 @@ echo "</pre>";
     </div> <!-- /container -->
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="/web/js/modernizr.js"></script>
+<script src="/web/js/geo.js"></script>
 <script>
 	$(document).ready(function() {
 		// Handler for .ready() called.
@@ -201,32 +200,65 @@ echo "</pre>";
 	});
 </script>
 <script>
-function success(position) {
-  
-  $.post("/verify/geo.php", { email:'<?php echo $ob_auth->googdata['email'];?>', lat: position.coords.latitude,lng:position.coords.longitude,acc:position.coords.accuracy }).done(function(data) {
-				$("p#whoisdata").html(data);
-				//alert("Data Loaded: " + data);
-			})
-  
+//	$(document).ready(function() {
+//		if (navigator.geolocation) {
+//		  //alert("geo!");
+//		  navigator.geolocation.getCurrentPosition(success, error);
+//		} else {
+//		  error('not supported');
+//		}
+//	}
+</script>
+<script>
+
+	var x=document.getElementById("demo");
 
 
-}
+	function success(position) {
+	  
+	  $.post("/verify/geo.php", { email:'<?php echo $ob_auth->googdata['email'];?>', lat: position.coords.latitude,lng:position.coords.longitude,acc:position.coords.accuracy }).done(function(data) {
+					$("p#whoisdata").html(data);
+					//alert("Data Loaded: " + data);
+				});
+	  
+	
+	
+	}
+	
+	function error(msg) {
+	  var s = document.querySelector('#status');
+	  s.innerHTML = typeof msg == 'string' ? msg : "failed";
+	  s.className = 'fail';
+	  
+	  // console.log(arguments);
+	}
 
-function error(msg) {
-  var s = document.querySelector('#status');
-  s.innerHTML = typeof msg == 'string' ? msg : "failed";
-  s.className = 'fail';
-  
-  // console.log(arguments);
-}
+	function lookup_location() {
+	  geo_position_js.getCurrentPosition(geo_success, geo_error);
+	}
 
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(success, error);
-} else {
-  error('not supported');
-}
+	function geo_success(p) {
+		//alert("Found you at latitude " + p.coords.latitude + ", longitude " + p.coords.longitude);
+		$.post("/api/test/fptest.php", { lat: p.coords.latitude, lng: p.coords.longitude , plguid: "<?php echo $ob_auth->verified['guid'];?>" }).done(function(data) {
+			$("p#geocontent").html(data);
+			//alert("Data Loaded: " + data);
+		});		
+		//alert("Data Loaded: " + data);
+	}
+	function geo_error() {
+		alert("Could not find you!");
+	}
+	function showPosition(position)
+  	{
+		x.innerHTML="xLatitude: " + position.coords.latitude + "<br>xLongitude: " + position.coords.longitude;
+		success(position);	
+ 	}
+
+	if (geo_position_js.init()) {
+		  geo_position_js.getCurrentPosition(geo_success, geo_error);
+	}
+
 
 </script>
-
 </body>
 </html>
