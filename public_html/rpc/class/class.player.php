@@ -11,13 +11,14 @@ class player
 			$redis->select(0); /*select databaseID*/ 
 			#echo "using redis\n";
 			
-			$test = $this->get_by_guid($u['guid']);
+			$dbresult = $this->get_by_guid($u['guid']);
 			#var_dump($test);
 			
-			if( !$test )
+			if( !$dbresult )
 			{
 				$this->log("key does not exist in redis and not in mysql");
 				#echo "key does not exist in redis and not in mysql\n";
+				
 				
 				$sql = "INSERT INTO ingress_players ( `guid` , `name` ,  `faction`   )VALUES ('".$u['guid']."','".$u['plain']."','".$u['team']."')";
 				$ob_database->execute($sql);
@@ -32,7 +33,9 @@ class player
 				$redis->set('playerguid:'.$u['guid'].':guid', $u['guid'] );
 				$redis->set('playerguid:'.$u['guid'].':faction', $u['team'] );
 				$redis->set('playerguid:'.$u['guid'].':nick', $u['plain'] );
-				//$redis->set('playerguid:'.$plguid.':level', $u['_level'] );
+				if($u['_level']>0||$u['_level']<>""){
+					$redis->set('playerguid:'.$u['guid'].':level', $u['_level'] );
+				}
 				//$redis->set('playerguid:'.$plguid.':lastupdated', $u['lastupdated'] );	
 				//$redis->set('playerguid:'.$plguid.':lastlocation', $u['lastseenat'] );
 				$redis->set('playername:'.$u['plain'],$u['guid'] );
@@ -43,8 +46,28 @@ class player
 			else 
 			{
 				$this->log("key exist in redis ( and so it does in mysql)");	
+				echo "key exist in redis ( and so it does in mysql)\n";
+				#echo "dbresult\n";
+				#print_r($dbresult);
 				
-				#print_r($test);
+				#echo "submitted\n";
+				#print_r($u);
+				$u['_level'];
+				
+				if($u['_level']>$dbresult['level']){ 
+					echo "LEVEL MISMATCH!\n";
+					
+					$sql = "UPDATE ingress_players SET level='".$u['_level']."' WHERE guid='".$u['guid']."'";
+					$ob_database->execute($sql);
+					
+					$redis->set('playerguid:'.$u['guid'].':level', $u['_level'] );
+					
+					  
+				}
+				
+				if($u['team']<>$dbresult['faction']){ 
+					echo "FACTION MISMATCH!\n";  
+				}
 				#print_r($u);
 				#die("key does exist in redis ( and so it does in mysql)");
 				
@@ -234,7 +257,6 @@ class player
 
 		
 	}
-
 
 
 

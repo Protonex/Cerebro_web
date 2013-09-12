@@ -7,7 +7,9 @@ class userarray {
 		error_log("################");
 		
 		
+#		print_r($usr);
 		
+		#echo "adduser ".$usr->plain." $level\n";
 		
 		
 		

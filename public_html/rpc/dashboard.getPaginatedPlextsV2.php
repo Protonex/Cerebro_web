@@ -161,6 +161,9 @@ foreach($RAW->result as $i){
 # loop thru all users that we have collected.
 $inserts = 0;
 $teller = 0;
+
+
+#print_r($ob_user->users);
 foreach($ob_user->users as $u){
 	
 	error_log("------------> ".$u['team']." ".$u['plain']." ");
@@ -191,16 +194,6 @@ die("!");
 
 # The end!
 
-function add_the_player($guid,$name=NULL,$level=0,$faction=NULL){
-	global $ob_database;
-	error_log("------------> adding:".$guid);
-	
-	
-	$sql = "INSERT INTO ingressv2_players (`guid`,`name`,`level`,`faction`)VALUES('$guid','".str_replace(":","",$name)."','$level','$faction');";
-	$res = $ob_database->execute($sql);
-	return $res;
-	
-}
 
 
 

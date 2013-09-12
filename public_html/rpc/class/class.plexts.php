@@ -9,7 +9,7 @@ class plexts {
 
 	function process($id,$plguid){
 		global $ob_database,$usr,$ob_plexts;	
-		
+		#echo "process\n";
 		#print_r($id);
 		
 		#genereated by
@@ -25,24 +25,16 @@ class plexts {
 		#array
 		$markup 	= $id[2]->plext->markup;
 		
-		if($msgtype!="PLAYER_GENERATED" && $msgtype!="SYSTEM_NARROWCAST"){
-			
-			//header("HTTP/1.0 404 Not Found");	
-			#echo "<pre>$msgtype\n";
-			
-			#print_r($id);
-			
-			#echo "</pre>";
-			
-		}else { echo $msgtype."\n"; }
+
 		
-	
+	#echo $msgtype."..\n"; 
 	
 		//die($msgtype);
 		
 		
 		switch($msgtype){
 			case "SYSTEM_NARROWCAST":
+				echo "> SYSTEM_NARROWCAST not implemented\n";
 				break;
 				## return!!!! - debug
 				
@@ -53,6 +45,7 @@ class plexts {
 				$result['plaintxt']=$plaintxt;
 				$result['markup']=json_encode($markup);
 				
+				print_r($markup);
 				
 				
 		
@@ -74,21 +67,23 @@ class plexts {
 				
 				break;
 			case "PLAYER_GENERATED":
-				break;  
+				#echo "> PLAYER_GENERATED\n";
+				#break;  
 				## return!!!! - debug
 				
 				
-				die("PLAYER_GENERATED");
+				
 				#echo  $id[2]->plext->team ." --> ".$id[2]->plext->plextType. "<br>";
 				$result = $this->player_generated($plguid,$genby,$uniqueid,$timestamp,$plaintxt,$markup);
 				
 	
-				
+				#die("PLAYER_GENERATED");
 				
 				
 				break;
 			
 			case "SYSTEM_BROADCAST":
+				#echo "> SYSTEM_BROADCAST not implemented.\n";
 				//break;
 				$result = $this->system_broadcast($plguid,$genby,$uniqueid,$timestamp,$plaintxt,$markup);
 				#print_r($result);
@@ -106,6 +101,8 @@ class plexts {
 				
 				
 				//add_the_player($guid,$name=NULL,$level=0,$faction=NULL);
+				
+				#print_r($result);
 				
 				break;
 				## return!!!! - debug
@@ -185,9 +182,20 @@ class plexts {
 	function player_generated($plguid,$genby,$uniqueid,$timestamp,$plaintext,$markup){
 	
 		$X=(array)$markup[1][1];
+		#print_r($X);
 		if($markup[1][1]->team=="ALIENS"||$markup[1][1]->team=="RESISTANCE"){
-			add_the_player($markup[1][1]->guid,$markup[1][1]->plain,$level=0,$markup[1][1]->team);
+			#echo "ADD\n";
+			$this->add_the_player($markup[1][1]->guid,str_replace(":","",trim($markup[1][1]->plain)),$level=0,$markup[1][1]->team);
 		}
+
+		if($markup[3][0]=="AT_PLAYER"){
+			if($markup[3][1]->team=="ALIENS"||$markup[3][1]->team=="RESISTANCE"){
+				#echo "ADD\n";
+				$this->add_the_player($markup[3][1]->guid,str_replace("@","",trim($markup[3][1]->plain)),$level=0,$markup[3][1]->team);
+			}
+		}
+
+
 	
 	}
 
@@ -266,9 +274,15 @@ class plexts {
 			if($markup[1][1]->plain==" deployed an "){
 				
 				
-				error_log("_____________________________________________________");
 				
-				$this->adduser($markup[0][1],$markup[2][1]->plain);
+				#print_r($markup[0][1]);
+				#print_r( str_replace("L","",$markup[2][1]->plain));
+				#print_r($markup);
+				#die();
+				
+error_log("_____________________________________________________");
+				
+				$this->adduser($markup[0][1],str_replace("L","",$markup[2][1]->plain));
 				
 				
 				
@@ -554,16 +568,28 @@ class plexts {
 
 	function adduser($x,$level=1){
 			global $ob_user;
+			//echo "adduser  $level \n";
+			//#print_r($x);
 			
 			foreach($x as $key=>$value){
 				error_log($key."->".$value);
 			}
-			
 			$ob_user->addusers($x,$level);
 	}
 
 
 
+
+	function add_the_player($guid,$name=NULL,$level=0,$faction=NULL){
+		global $ob_database;
+		error_log("------------> adding:".$guid);
+		
+		
+		#$sql = "INSERT INTO ingressv2_players (`guid`,`name`,`level`,`faction`)VALUES('$guid','".str_replace(":","",trim($name) )."','$level','$faction');";
+		#$res = $ob_database->execute($sql);
+		return $res;
+		
+	}
 
 
 
